@@ -277,7 +277,7 @@ void gender(){
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
-        printf("zadaj m pre muza alebo z pre zenu: ");
+        printf("zadaj m pre muza alebo f pre zenu: ");
         scanf(" %c", &volba);
         if((volba=='m' || volba=='f'))
         {
@@ -299,6 +299,74 @@ void gender(){
     }
 }
 
+void brand(){
+    Jazdci Jazdec[100];
+    FILE* subor;
+    char ln[1000], *string, meno[100];
+    int poradie=0, pomoc=0;
+    subor=fopen("jazdci.csv","r");
+    if(subor==NULL){
+        printf("Subor nie je mozne precitat.");
+    }else{
+        while (fgets(ln, 1000, subor)){
+                string=strtok(ln, ";");
+                strcpy(meno ,string);
+                string=strrchr(meno, ' ');
+                strcpy(Jazdec[poradie].priezvisko,string+1);
+                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
+                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
+                string=strtok(NULL, ";");
+                Jazdec[poradie].pohlavie=string[0];
+                string=strtok(NULL, ";");
+                Jazdec[poradie].narodenie=atoi(string);
+                string=strtok(NULL, ";");
+                strcpy(Jazdec[poradie].Auto,string);
+                for (int i = 0; i < 5; ++i) {
+                    string=strtok(NULL, ";");
+                    Jazdec[poradie].kola[i]=atof(string);
+                }
+
+                pomoc=0;
+                poradie++;
+            }
+        fclose(subor);
+        float najlepsie_kolo=9999;
+        int poradie_kola=0;
+        int poradie_jazdca=0;
+        int poradie_opakovania=0;
+        //int test=0;
+        char opakovanie[poradie][100];
+        for(int i=0; i<poradie;i++){
+            for(int k=0; k<poradie; k++){
+                    if(strcmp(Jazdec[i].Auto,Jazdec[k].Auto)==0)
+                    {int dlzka_pola_opakovanie=0;
+
+                       for(int j=0; j<5; j++){
+                           //printf("som tu1\n");
+                            if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0)
+                            {
+                               // printf("som tu2\n");
+                                najlepsie_kolo=Jazdec[i].kola[j];
+                                poradie_kola=j+1;
+                                poradie_jazdca=i;
+
+                            }
+                        }
+                        strcpy(opakovanie[poradie_opakovania], Jazdec[i].Auto);
+                        poradie_opakovania++;
+
+                    }
+                }
+                printf("Znacka: %s\nNajlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n\n", Jazdec[poradie_jazdca].Auto,najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
+                najlepsie_kolo=9999;
+                poradie_kola=0;
+                poradie_jazdca=0;
+        }
+
+
+    }
+}
+
 
 
 int main() {
@@ -315,7 +383,7 @@ int main() {
         } else if (Vstup == 'g'){
             gender();
         } else if (Vstup == 'b'){
-
+            brand();
         } else if (Vstup == 'y'){
 
         } else if (Vstup == 'a'){
