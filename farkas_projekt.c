@@ -9,7 +9,9 @@ typedef struct Jazdci{
     char Auto[50];
     float kola[5];
 }Jazdci;
+int menu(){
 
+}
 int Pocet_riadkov(){
     FILE* subor;
     char ln[1000], *string;
@@ -78,7 +80,7 @@ struct Jazdci *vytvor(){
     }
 return &Jazdec;
 }
-void sum(void){
+void sum(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
    if(fopen("jazdci.csv", "r")==NULL)
@@ -368,7 +370,62 @@ void brand(){
         }
     }
 }
+void year(){
+    Jazdci Jazdec[100];
+    FILE* subor;
+    char ln[1000], *string, meno[100];
+    int poradie=0, pomoc=0;
+    subor=fopen("jazdci.csv","r");
+    if(subor==NULL){
+        printf("Subor nie je mozne precitat.");
+    }else{
+        while (fgets(ln, 1000, subor)){
+                string=strtok(ln, ";");
+                strcpy(meno ,string);
+                string=strrchr(meno, ' ');
+                strcpy(Jazdec[poradie].priezvisko,string+1);
+                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
+                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
+                string=strtok(NULL, ";");
+                Jazdec[poradie].pohlavie=string[0];
+                string=strtok(NULL, ";");
+                Jazdec[poradie].narodenie=atoi(string);
+                string=strtok(NULL, ";");
+                strcpy(Jazdec[poradie].Auto,string);
+                for (int i = 0; i < 5; ++i) {
+                    string=strtok(NULL, ";");
+                    Jazdec[poradie].kola[i]=atof(string);
+                }
 
+                pomoc=0;
+                poradie++;
+            }
+        fclose(subor);
+        int volba=0;
+        float najlepsie_kolo=9999;
+        int poradie_kola=0;
+        int poradie_jazdca=0;
+        printf("zadaj m pre muza alebo f pre zenu: ");
+        scanf(" %d", &volba);
+        if((999<volba&&volba<10000))
+        {
+            for(int i=0; i<poradie;i++){
+            for(int j=0; j<5; j++){
+
+                    if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].narodenie==volba)
+                    {
+                        najlepsie_kolo=Jazdec[i].kola[j];
+                        poradie_kola=j+1;
+                        poradie_jazdca=i;
+                    }
+                }
+            }
+            printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
+        }
+        else{printf("nespravny format roka");}
+
+    }
+}
 
 
 int main() {
@@ -381,13 +438,12 @@ int main() {
             driver();
         } else if (Vstup == 'l'){
             lap();
-
         } else if (Vstup == 'g'){
             gender();
         } else if (Vstup == 'b'){
             brand();
         } else if (Vstup == 'y'){
-
+            year();
         } else if (Vstup == 'a'){
 
         }else if (Vstup == 'u'){
@@ -397,13 +453,6 @@ int main() {
         }else if (Vstup == 'n'){
 
         }else if (Vstup == 'r'){
-
-        Jazdci* JJazdec=vytvor();
-
-        printf("%s\n", JJazdec);
-
-
-
 
         }else if (Vstup == 'x'){
             break;
