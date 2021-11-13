@@ -306,7 +306,6 @@ void average(){
                         break;
                     }
                     else{
-                           // printf("%f\n", Jazdec[i].kola[j]);
                             avengers+=Jazdec[i].kola[j];}
                 }
             if(neodjazdene_kola==1)
@@ -330,6 +329,51 @@ void average(){
     }
 }
 
+void under(){
+   FILE *subor;
+   subor = fopen("jazdci.csv", "r");
+   if(fopen("jazdci.csv", "r")==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    } else{
+        printf("otvoreny subor\n");
+        Jazdci Jazdec[100];
+        int poradie=0, nenaslo=0;
+        float vstup;
+        printf("zadaj cas kola: ");
+        scanf(" %f", &vstup);
+        printf("\n");
+       // float avengers=0;
+       // float najlepsi_avenger=0;
+       // int najlepsi_avenger_poradie=0;
+       // int neodjazdene_kola=0;
+       int pocet_najdenych=0;
+        vytvor(subor, (Jazdci*) Jazdec, &poradie);
+        for(int i=0;i<poradie;i++){
+                float najdene_kola[5];
+                for(int j=0;j<5;j++){
+                    if(Jazdec[i].kola[j]<=vstup&&Jazdec[i].kola[j]!=0)
+                    {
+                          //printf(", %d(%.3f)", j+1, Jazdec[i].kola[j]);
+                          najdene_kola[pocet_najdenych]=Jazdec[i].kola[j];
+                          pocet_najdenych++;
+                    }
+                    else{nenaslo++;}
+            }
+            if(nenaslo<5){
+                    printf("%s %s - %d kola", Jazdec[i].krstne, Jazdec[i].priezvisko, pocet_najdenych);
+                    for(int k=0;k<pocet_najdenych;k++){
+                        printf(", %d(%.3f)", k+1, najdene_kola[k]);
+                    }
+                    printf("\n");
+            }
+            nenaslo=0;
+            pocet_najdenych=0;
+
+        }
+    }
+}
+
 
 int main() {
     char Vstup=' ';
@@ -350,7 +394,7 @@ int main() {
         } else if (Vstup == 'a'){
             average();
         }else if (Vstup == 'u'){
-
+            under();
         }else if (Vstup == 'c'){
 
         }else if (Vstup == 'n'){
