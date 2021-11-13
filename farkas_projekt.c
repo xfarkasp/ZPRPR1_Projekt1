@@ -283,6 +283,52 @@ void year(){
 
     }
 }
+void average(){
+   FILE *subor;
+   subor = fopen("jazdci.csv", "r");
+   if(fopen("jazdci.csv", "r")==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    } else{
+        printf("otvoreny subor\n");
+        Jazdci Jazdec[100];
+        int poradie=0;
+        float avengers=0;
+        float najlepsi_avenger=0;
+        int najlepsi_avenger_poradie=0;
+        int neodjazdene_kola=0;
+        vytvor(subor, (Jazdci*) Jazdec, &poradie);
+        for(int i=0;i<poradie;i++){
+                for(int j=0;j<5;j++){
+                    if(Jazdec[i].kola[j]==0){
+                        neodjazdene_kola=1;
+                        avengers=0;
+                        break;
+                    }
+                    else{
+                           // printf("%f\n", Jazdec[i].kola[j]);
+                            avengers+=Jazdec[i].kola[j];}
+                }
+            if(neodjazdene_kola==1)
+            {
+                printf("%s %s - Neodjazdene vsetky kola\n", Jazdec[i].krstne, Jazdec[i].priezvisko);
+                neodjazdene_kola=0;
+            }
+            else
+            {
+                printf("%s %s - %.3f\n", Jazdec[i].krstne, Jazdec[i].priezvisko, avengers/5);
+                if(avengers>najlepsi_avenger)
+                {
+                    najlepsi_avenger=avengers/5;
+                    najlepsi_avenger_poradie=i;
+                }
+                avengers=0;
+            }
+
+        }
+        printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
+    }
+}
 
 
 int main() {
@@ -302,7 +348,7 @@ int main() {
         } else if (Vstup == 'y'){
             year();
         } else if (Vstup == 'a'){
-
+            average();
         }else if (Vstup == 'u'){
 
         }else if (Vstup == 'c'){
