@@ -166,45 +166,23 @@ void lap(){
 void gender(){
     Jazdci Jazdec[100];
     FILE* subor;
-    char ln[1000], *string, meno[100];
-    int poradie=0, pomoc=0;
+    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        while (fgets(ln, 1000, subor)){
-                string=strtok(ln, ";");
-                strcpy(meno ,string);
-                string=strrchr(meno, ' ');
-                strcpy(Jazdec[poradie].priezvisko,string+1);
-                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
-                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
-                string=strtok(NULL, ";");
-                Jazdec[poradie].pohlavie=string[0];
-                string=strtok(NULL, ";");
-                Jazdec[poradie].narodenie=atoi(string);
-                string=strtok(NULL, ";");
-                strcpy(Jazdec[poradie].Auto,string);
-                for (int i = 0; i < 5; ++i) {
-                    string=strtok(NULL, ";");
-                    Jazdec[poradie].kola[i]=atof(string);
-                }
-
-                pomoc=0;
-                poradie++;
-            }
+        vytvor(subor, (Jazdci*) Jazdec, &poradie);
         fclose(subor);
         char volba=' ';
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
-        printf("zadaj m pre muza alebo f     pre zenu: ");
+        printf("zadaj m pre muza alebo f pre zenu: ");
         scanf(" %c", &volba);
         if((volba=='m' || volba=='f'))
         {
             for(int i=0; i<poradie;i++){
             for(int j=0; j<5; j++){
-
                     if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].pohlavie==volba)
                     {
                         najlepsie_kolo=Jazdec[i].kola[j];
@@ -216,38 +194,17 @@ void gender(){
             printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
         }
         else{printf("nespravny vstup");}
-
     }
 }
 void brand(){
     struct Jazdci Jazdec[100];
     FILE* subor;
-    char ln[1000], *string, meno[100];
-    int poradie=0, pomoc=0;
+    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        while (fgets(ln, 1000, subor)){
-                string=strtok(ln, ";");
-                strcpy(meno ,string);
-                string=strrchr(meno, ' ');
-                strcpy(Jazdec[poradie].priezvisko,string+1);
-                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
-                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
-                string=strtok(NULL, ";");
-                Jazdec[poradie].pohlavie=string[0];
-                string=strtok(NULL, ";");
-                Jazdec[poradie].narodenie=atoi(string);
-                string=strtok(NULL, ";");
-                strcpy(Jazdec[poradie].Auto,string);
-                for (int i = 0; i < 5; ++i) {
-                    string=strtok(NULL, ";");
-                    Jazdec[poradie].kola[i]=atof(string);
-                }
-                pomoc=0;
-                poradie++;
-            }
+        vytvor(subor, (Jazdci*) Jazdec, &poradie);
         fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
@@ -294,46 +251,25 @@ void brand(){
 void year(){
     Jazdci Jazdec[100];
     FILE* subor;
-    char ln[1000], *string, meno[100];
-    int poradie=0, pomoc=0;
+    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        while (fgets(ln, 1000, subor)){
-                string=strtok(ln, ";");
-                strcpy(meno ,string);
-                string=strrchr(meno, ' ');
-                strcpy(Jazdec[poradie].priezvisko,string+1);
-                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
-                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
-                string=strtok(NULL, ";");
-                Jazdec[poradie].pohlavie=string[0];
-                string=strtok(NULL, ";");
-                Jazdec[poradie].narodenie=atoi(string);
-                string=strtok(NULL, ";");
-                strcpy(Jazdec[poradie].Auto,string);
-                for (int i = 0; i < 5; ++i) {
-                    string=strtok(NULL, ";");
-                    Jazdec[poradie].kola[i]=atof(string);
-                }
-
-                pomoc=0;
-                poradie++;
-            }
+        vytvor(subor, (Jazdci*) Jazdec, &poradie);
         fclose(subor);
         int volba=0;
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
-        printf("zadaj m pre muza alebo f pre zenu: ");
+        printf("zadaj rok narodenia: ");
         scanf(" %d", &volba);
         if((999<volba&&volba<10000))
         {
             for(int i=0; i<poradie;i++){
             for(int j=0; j<5; j++){
 
-                    if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].narodenie==volba)
+                    if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].narodenie<volba)
                     {
                         najlepsie_kolo=Jazdec[i].kola[j];
                         poradie_kola=j+1;
