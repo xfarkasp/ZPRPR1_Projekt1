@@ -38,7 +38,7 @@ void vytvor(FILE* Subor,Jazdci *Jazdec, int *Poradie){
 
                 pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
 
-                printf("pomoc: %d", pomoc);
+               // printf("pomoc: %d", pomoc);
                 strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
 
                 string=strtok(NULL, ";");
@@ -82,7 +82,7 @@ void sum(){
       printf("Neotvoreny subor\n");
     } else{
         printf("otvoreny subor\n");
-        Jazdci Jazdec[100];
+        Jazdci Jazdec[1000];
         int poradie=0;
         vytvor(subor, &Jazdec, &poradie);
         fclose(subor);
@@ -102,6 +102,7 @@ void sum(){
             printf(" Automobil: %s\n", Jazdec[i].Auto);
             printf("Casy okruhov %.3f; %.3f; %.3f; %.3f; %.3f\n", Jazdec[i].kola[0] , Jazdec[i].kola[1], Jazdec[i].kola[2], Jazdec[i].kola[3], Jazdec[i].kola[4]);
         }
+        memset(Jazdec,0,sizeof(Jazdec));
     }
 }
 void driver(){
@@ -169,7 +170,7 @@ void lap(){
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, (Jazdci*) Jazdec, &poradie);
+        vytvor(subor, &Jazdec, &poradie);
         fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
@@ -195,7 +196,7 @@ void gender(){
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, (Jazdci*) Jazdec, &poradie);
+        vytvor(subor, &Jazdec, &poradie);
         fclose(subor);
         char volba=' ';
         float najlepsie_kolo=9999;
@@ -280,7 +281,7 @@ void year(){
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, (Jazdci*) Jazdec, &poradie);
+        vytvor(subor, &Jazdec, &poradie);
         fclose(subor);
         int volba=0;
         float najlepsie_kolo=9999;
@@ -320,38 +321,39 @@ void average(){
         int poradie=0;
         vytvor(subor, &Jazdec, &poradie);
         float avengers=0;
-        float najlepsi_avenger=0;
+        float najlepsi_avenger=9999;
         int najlepsi_avenger_poradie=0;
         int neodjazdene_kola=0;
-        for(int i=0;i<poradie;i++){
-                for(int j=0;j<5;j++){
-                    if(Jazdec[i].kola[j]==0){
-                        neodjazdene_kola=1;
-                        avengers=0;
-                        break;
-                    }
-                    else{
-                            avengers+=Jazdec[i].kola[j];}
-                }
-            if(neodjazdene_kola==1)
-            {
-                printf("%s %s - Neodjazdene vsetky kola\n", Jazdec[i].krstne, Jazdec[i].priezvisko);
-                neodjazdene_kola=0;
-            }
-            else
-            {
-                printf("%s %s - %.3f\n", Jazdec[i].krstne, Jazdec[i].priezvisko, avengers/5);
-                if(avengers>najlepsi_avenger)
-                {
-                    najlepsi_avenger=avengers/5;
-                    najlepsi_avenger_poradie=i;
-                }
-                avengers=0;
-            }
-
-        }
-        printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
-    }
+//        for(int i=0;i<poradie;i++){
+//                for(int j=0;j<5;j++){
+//                    if(Jazdec[i].kola[j]==0){
+//                        neodjazdene_kola=1;
+//                        avengers=0;
+//                        break;
+//                    }
+//                    else{
+//                            avengers+=Jazdec[i].kola[j];}
+//                }
+//            if(neodjazdene_kola==1)
+//            {
+//                printf("%s %s - Neodjazdene vsetky kola\n", Jazdec[i].krstne, Jazdec[i].priezvisko);
+//                neodjazdene_kola=0;
+//            }
+//            else
+//            {
+//                printf("%s %s - %.3f\n", Jazdec[i].krstne, Jazdec[i].priezvisko, avengers/5);
+//                if(avengers/5<najlepsi_avenger)
+//                {
+//                    najlepsi_avenger=avengers/5;
+//                    najlepsi_avenger_poradie=i;
+//                }
+//                avengers=0;
+//            }
+//
+//        }
+//        printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
+   }
+    memset(Jazdec,0,sizeof(Jazdec));
 }
 void under(){
    Jazdci Jazdec[1000];
