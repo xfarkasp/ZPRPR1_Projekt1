@@ -416,6 +416,41 @@ void under(){
     }
 }
 
+void newdriver(){
+
+   FILE *subor;
+   subor = fopen("jazdci.csv", "a");
+   if(subor==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    } else{
+
+        char krstne[100], priezvisko[100], pohlavie=' ', znacka[50], vloz[1000];
+        int rok=0;
+        float kolo1=0, kolo2=0, kolo3=0, kolo4=0, kolo5=0;
+
+        printf("zadaj meno jazdca: ");
+        scanf(" %s %s", &krstne, &priezvisko);
+
+        printf("zadaj rok narodenia: ");
+        scanf(" %d", &rok);
+
+        printf("zadaj pohlavie jazdca: ");
+        scanf(" %c",&pohlavie);
+
+        printf("zadaj auto jazdca: ");
+        scanf(" %s",&znacka);
+        printf("\n");
+
+        printf("zadaj 5 casov jazdca: ");
+        scanf(" %f;%f;%f;%f;%f", &kolo1, &kolo2, &kolo3, &kolo4, &kolo5);
+        printf("\n");
+        fprintf(subor,"\n%s %s;%c;%d;%s;%f;%f;%f;%f;%f", krstne, priezvisko, pohlavie, rok, znacka, kolo1, kolo2, kolo3, kolo4, kolo5);
+        fclose(subor);
+    }
+
+}
+
 int main() {
     char Vstup=' ';
     while (1) {
@@ -439,7 +474,7 @@ int main() {
         }else if (Vstup == 'c'){
 
         }else if (Vstup == 'n'){
-
+            newdriver();
         }else if (Vstup == 'r'){
 
         }else if (Vstup == 'x'){
