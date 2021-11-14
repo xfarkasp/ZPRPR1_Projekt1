@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef struct Jazdci{
+typedef struct Jazdciiiii{
     char krstne[100];
     char priezvisko[100];
     char pohlavie;
@@ -10,7 +10,6 @@ typedef struct Jazdci{
     float kola[5];
 }Jazdci;
 int menu(){
-
 }
 int Pocet_riadkov(){
     FILE* subor;
@@ -184,7 +183,7 @@ void lap(){
                     }
             }
         }
-        printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
+        printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
     }
 }
 void gender(){
@@ -424,7 +423,7 @@ void newdriver(){
    {
       printf("Neotvoreny subor\n");
     } else{
-
+        
         char krstne[100], priezvisko[100], pohlavie=' ', znacka[50], vloz[1000];
         int rok=0;
         float kolo1=0, kolo2=0, kolo3=0, kolo4=0, kolo5=0;
@@ -434,10 +433,10 @@ void newdriver(){
 
         printf("zadaj rok narodenia: ");
         scanf(" %d", &rok);
-
+    
         printf("zadaj pohlavie jazdca: ");
         scanf(" %c",&pohlavie);
-
+        
         printf("zadaj auto jazdca: ");
         scanf(" %s",&znacka);
         printf("\n");
