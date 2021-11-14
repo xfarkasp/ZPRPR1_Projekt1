@@ -27,19 +27,20 @@ int Pocet_riadkov(){
     }
     return Riadky;
 }
-void vytvor(FILE* Subor,Jazdci *Jazdec, int *Poradie){
+void vytvor(FILE *Subor,Jazdci *Jazdec){
     char ln[1000], *string, meno[100];
     int pomoc=0, poradie=0;
         while (fgets(ln, 1000, Subor)){
+                memset(meno, 0, sizeof(meno));
                 string=strtok(ln, ";");
-                strcpy(meno ,string);
-                string=strrchr(meno, ' ');
+                strcpy(Jazdec[poradie].krstne ,string);
+                string=strrchr(Jazdec[poradie].krstne, ' ');
                 strcpy(Jazdec[poradie].priezvisko,string+1);
 
-                pomoc=strlen(meno)-strlen(Jazdec[poradie].priezvisko);
+                pomoc=strlen(Jazdec[poradie].krstne)-strlen(Jazdec[poradie].priezvisko);
 
-               // printf("pomoc: %d", pomoc);
-                strncpy(Jazdec[poradie].krstne, meno, pomoc-1);
+                strncpy(meno, Jazdec[poradie].krstne, pomoc-1);
+                strcpy(Jazdec[poradie].krstne, meno);
 
                 string=strtok(NULL, ";");
                 Jazdec[poradie].pohlavie=string[0];
@@ -70,9 +71,8 @@ void vytvor(FILE* Subor,Jazdci *Jazdec, int *Poradie){
             //*Poradie=*Poradie+1;
             //printf("%d\n", *Poradie);
     }
-    *Poradie=poradie;
-    //free(Poradie);
-
+    fclose(Subor);
+    free(Subor);
 }
 void sum(){
    FILE *subor;
@@ -81,12 +81,12 @@ void sum(){
    {
       printf("Neotvoreny subor\n");
     } else{
+        printf("adresa %d\n", &subor);
         printf("otvoreny subor\n");
-        Jazdci Jazdec[1000];
-        int poradie=0;
-        vytvor(subor, &Jazdec, &poradie);
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
         fclose(subor);
-        for(int i=0; i<poradie;i++){
+        for(int i=0; i<Pocet_riadkov();i++){
             printf("%s", Jazdec[i].krstne);
             printf(" %s,", Jazdec[i].priezvisko);
             printf(" nar. %d,", Jazdec[i].narodenie);
@@ -102,13 +102,13 @@ void sum(){
             printf(" Automobil: %s\n", Jazdec[i].Auto);
             printf("Casy okruhov %.3f; %.3f; %.3f; %.3f; %.3f\n", Jazdec[i].kola[0] , Jazdec[i].kola[1], Jazdec[i].kola[2], Jazdec[i].kola[3], Jazdec[i].kola[4]);
         }
-        memset(Jazdec,0,sizeof(Jazdec));
+        fclose(subor);
+        subor=NULL;
+        //free("jazdci.csv");
     }
 }
 void driver(){
-   Jazdci Jazdec[1000];
    FILE* subor;
-   int poradie=0;
    subor = fopen("jazdci.csv", "r");
    if(fopen("jazdci.csv", "r")==NULL)
    {
@@ -120,9 +120,9 @@ void driver(){
         printf("Zadaj priezvisko jazdca: ");
         scanf("%s", &vstup);
         printf("\n");
-        Jazdci Jazdec[100];
-        vytvor(subor, &Jazdec, &poradie);
-        for(int i=0;i<poradie;i++){
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
+        for(int i=0;i<Pocet_riadkov();i++){
             if(strcmp(vstup, Jazdec[i].priezvisko)==0){
                 for(int j=0;j<5;j++){
                     if(Jazdec[i].kola[j]>maxi)
@@ -152,30 +152,22 @@ void driver(){
             break;
             }
         }
-        (const struct Jazdci){ 0 };
-        //memset(meno, 0, sizeof(meno));
-        for(int i=0;i<poradie;i++){
-            memset(Jazdec[i].krstne, 0, sizeof(Jazdec[i].krstne));
-            memset(Jazdec[i].priezvisko, 0, sizeof(Jazdec[i].priezvisko));
-        }
-
     }
 }
 void lap(){
-    Jazdci Jazdec[1000];
     FILE* subor;
-    char ln[1000], *string, meno[100];
-    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, &Jazdec, &poradie);
+        int poradie=0;
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
         fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
-        for(int i=0; i<poradie;i++){
+        for(int i=0; i<Pocet_riadkov();i++){
             for(int j=0; j<5; j++){
                     if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0)
                     {
@@ -189,14 +181,14 @@ void lap(){
     }
 }
 void gender(){
-    Jazdci Jazdec[1000];
     FILE* subor;
-    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, &Jazdec, &poradie);
+        int poradie=0;
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
         fclose(subor);
         char volba=' ';
         float najlepsie_kolo=9999;
@@ -206,7 +198,7 @@ void gender(){
         scanf(" %c", &volba);
         if((volba=='m' || volba=='f'))
         {
-            for(int i=0; i<poradie;i++){
+            for(int i=0; i<Pocet_riadkov();i++){
             for(int j=0; j<5; j++){
                     if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].pohlavie==volba)
                     {
@@ -222,22 +214,22 @@ void gender(){
     }
 }
 void brand(){
-    Jazdci Jazdec[1000];
     FILE* subor;
-    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, &Jazdec, &poradie);
+        int poradie=0;
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
         fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
         int poradie_opakovania=0;
-        char opakovanie[poradie][Pocet_riadkov()];
-        for(int i=0; i<poradie;i++){
-            for(int k=0; k<poradie; k++){
+        char opakovanie[100][Pocet_riadkov()];
+        for(int i=0; i<Pocet_riadkov();i++){
+            for(int k=0; k<Pocet_riadkov(); k++){
                     if(strcmp(Jazdec[i].Auto,Jazdec[k].Auto)==0)
                     {
                        if(strcmp(Jazdec[i].Auto,opakovanie[k])==0)
@@ -274,14 +266,14 @@ void brand(){
     }
 }
 void year(){
-    Jazdci Jazdec[1000];
     FILE* subor;
-    int poradie=0;
     subor=fopen("jazdci.csv","r");
     if(subor==NULL){
         printf("Subor nie je mozne precitat.");
     }else{
-        vytvor(subor, &Jazdec, &poradie);
+        int poradie=0;
+        Jazdci Jazdec[Pocet_riadkov()];
+        vytvor(subor, &Jazdec);
         fclose(subor);
         int volba=0;
         float najlepsie_kolo=9999;
@@ -291,7 +283,7 @@ void year(){
         scanf(" %d", &volba);
         if((999<volba&&volba<10000))
         {
-            for(int i=0; i<poradie;i++){
+            for(int i=0; i<Pocet_riadkov();i++){
             for(int j=0; j<5; j++){
 
                     if(Jazdec[i].kola[j]<najlepsie_kolo&&Jazdec[i].kola[j]!=0&&Jazdec[i].narodenie<volba)
@@ -305,12 +297,11 @@ void year(){
             printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
         }
         else{printf("nespravny format roka");}
-        memset(Jazdec, 0, sizeof(Jazdec));
+        //memset(Jazdec, 0, sizeof(Jazdec));
 
     }
 }
 void average(){
-   Jazdci Jazdec[1000];
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
    if(fopen("jazdci.csv", "r")==NULL)
@@ -318,45 +309,45 @@ void average(){
       printf("Neotvoreny subor\n");
     } else{
         printf("otvoreny subor\n");
+        Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0;
-        vytvor(subor, &Jazdec, &poradie);
+        vytvor(subor, &Jazdec);
         float avengers=0;
         float najlepsi_avenger=9999;
         int najlepsi_avenger_poradie=0;
         int neodjazdene_kola=0;
-//        for(int i=0;i<poradie;i++){
-//                for(int j=0;j<5;j++){
-//                    if(Jazdec[i].kola[j]==0){
-//                        neodjazdene_kola=1;
-//                        avengers=0;
-//                        break;
-//                    }
-//                    else{
-//                            avengers+=Jazdec[i].kola[j];}
-//                }
-//            if(neodjazdene_kola==1)
-//            {
-//                printf("%s %s - Neodjazdene vsetky kola\n", Jazdec[i].krstne, Jazdec[i].priezvisko);
-//                neodjazdene_kola=0;
-//            }
-//            else
-//            {
-//                printf("%s %s - %.3f\n", Jazdec[i].krstne, Jazdec[i].priezvisko, avengers/5);
-//                if(avengers/5<najlepsi_avenger)
-//                {
-//                    najlepsi_avenger=avengers/5;
-//                    najlepsi_avenger_poradie=i;
-//                }
-//                avengers=0;
-//            }
-//
-//        }
-//        printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
+        for(int i=0;i<Pocet_riadkov();i++){
+                for(int j=0;j<5;j++){
+                    if(Jazdec[i].kola[j]==0){
+                        neodjazdene_kola=1;
+                        avengers=0;
+                        break;
+                    }
+                    else{
+                            avengers+=Jazdec[i].kola[j];}
+                }
+            if(neodjazdene_kola==1)
+            {
+                printf("%s %s - Neodjazdene vsetky kola\n", Jazdec[i].krstne, Jazdec[i].priezvisko);
+                neodjazdene_kola=0;
+            }
+            else
+            {
+                printf("%s %s - %.3f\n", Jazdec[i].krstne, Jazdec[i].priezvisko, avengers/5);
+                if(avengers/5<najlepsi_avenger)
+                {
+                    najlepsi_avenger=avengers/5;
+                    najlepsi_avenger_poradie=i;
+                }
+                avengers=0;
+            }
+
+        }
+        printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
    }
-    memset(Jazdec,0,sizeof(Jazdec));
+    //memset(Jazdec,0,sizeof(Jazdec));
 }
 void under(){
-   Jazdci Jazdec[1000];
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
    if(fopen("jazdci.csv", "r")==NULL)
@@ -364,14 +355,15 @@ void under(){
       printf("Neotvoreny subor\n");
     } else{
         printf("otvoreny subor\n");
+        Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0, nenaslo=0;
-        vytvor(subor, &Jazdec, &poradie);
+        vytvor(subor, &Jazdec);
         float vstup;
         printf("zadaj cas kola: ");
         scanf(" %f", &vstup);
         printf("\n");
        int pocet_najdenych=0;
-        for(int i=0;i<poradie;i++){
+        for(int i=0;i<Pocet_riadkov();i++){
                 float najdene_kola[5];
                 for(int j=0;j<5;j++){
                     if(Jazdec[i].kola[j]<=vstup&&Jazdec[i].kola[j]!=0)
