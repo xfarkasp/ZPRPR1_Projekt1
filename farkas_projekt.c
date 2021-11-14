@@ -25,6 +25,7 @@ int Pocet_riadkov(){
                 Riadky++;
         }
     }
+    fclose(subor);
     return Riadky;
 }
 void vytvor(FILE *Subor,Jazdci *Jazdec){
@@ -57,35 +58,34 @@ void vytvor(FILE *Subor,Jazdci *Jazdec){
             pomoc=0;
             poradie++;
     }
-    for(int i=0; i<poradie;i++){
-                printf("%s", Jazdec[i].krstne);
-                printf(" %s", Jazdec[i].priezvisko);
-                printf(" %c", Jazdec[i].pohlavie);
-                printf(" %d", Jazdec[i].narodenie);
-                printf(" %s", Jazdec[i].Auto);
-                printf(" %.3f", Jazdec[i].kola[0]);
-                printf(" %.3f", Jazdec[i].kola[1]);
-                printf(" %.3f", Jazdec[i].kola[2]);
-                printf(" %.3f", Jazdec[i].kola[3]);
-                printf(" %.3f\n\n", Jazdec[i].kola[4]);
-            //*Poradie=*Poradie+1;
-            //printf("%d\n", *Poradie);
-    }
-    fclose(Subor);
-    free(Subor);
+    // for(int i=0; i<poradie;i++){
+    //             printf("%s", Jazdec[i].krstne);
+    //             printf(" %s", Jazdec[i].priezvisko);
+    //             printf(" %c", Jazdec[i].pohlavie);
+    //             printf(" %d", Jazdec[i].narodenie);
+    //             printf(" %s", Jazdec[i].Auto);
+    //             printf(" %.3f", Jazdec[i].kola[0]);
+    //             printf(" %.3f", Jazdec[i].kola[1]);
+    //             printf(" %.3f", Jazdec[i].kola[2]);
+    //             printf(" %.3f", Jazdec[i].kola[3]);
+    //             printf(" %.3f\n\n", Jazdec[i].kola[4]);
+    // }
 }
 void sum(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
-   if(fopen("jazdci.csv", "r")==NULL)
+   if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
     } else{
-        printf("adresa %d\n", &subor);
         printf("otvoreny subor\n");
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
-        fclose(subor);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         for(int i=0; i<Pocet_riadkov();i++){
             printf("%s", Jazdec[i].krstne);
             printf(" %s,", Jazdec[i].priezvisko);
@@ -102,15 +102,12 @@ void sum(){
             printf(" Automobil: %s\n", Jazdec[i].Auto);
             printf("Casy okruhov %.3f; %.3f; %.3f; %.3f; %.3f\n", Jazdec[i].kola[0] , Jazdec[i].kola[1], Jazdec[i].kola[2], Jazdec[i].kola[3], Jazdec[i].kola[4]);
         }
-        fclose(subor);
-        subor=NULL;
-        //free("jazdci.csv");
     }
 }
 void driver(){
    FILE* subor;
    subor = fopen("jazdci.csv", "r");
-   if(fopen("jazdci.csv", "r")==NULL)
+   if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
     } else{
@@ -121,7 +118,13 @@ void driver(){
         scanf("%s", &vstup);
         printf("\n");
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
+        vytvor(subor,(Jazdci *) &Jazdec);
+
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         for(int i=0;i<Pocet_riadkov();i++){
             if(strcmp(vstup, Jazdec[i].priezvisko)==0){
                 for(int j=0;j<5;j++){
@@ -162,8 +165,12 @@ void lap(){
     }else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
-        fclose(subor);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
@@ -188,8 +195,12 @@ void gender(){
     }else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
-        fclose(subor);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         char volba=' ';
         float najlepsie_kolo=9999;
         int poradie_kola=0;
@@ -221,8 +232,12 @@ void brand(){
     }else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
-        fclose(subor);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
@@ -273,8 +288,12 @@ void year(){
     }else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
-        vytvor(subor, &Jazdec);
-        fclose(subor);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         int volba=0;
         float najlepsie_kolo=9999;
         int poradie_kola=0;
@@ -304,14 +323,19 @@ void year(){
 void average(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
-   if(fopen("jazdci.csv", "r")==NULL)
+   if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
     } else{
         printf("otvoreny subor\n");
         Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0;
-        vytvor(subor, &Jazdec);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         float avengers=0;
         float najlepsi_avenger=9999;
         int najlepsi_avenger_poradie=0;
@@ -350,14 +374,19 @@ void average(){
 void under(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
-   if(fopen("jazdci.csv", "r")==NULL)
+   if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
     } else{
         printf("otvoreny subor\n");
         Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0, nenaslo=0;
-        vytvor(subor, &Jazdec);
+        vytvor(subor,(Jazdci *) &Jazdec);
+        if(fclose(subor)== 0)
+        {
+        printf("\nFILE SUCCESSFULLY CLOSED\n");
+        }
+        else{printf("subor sa nezavrel");}
         float vstup;
         printf("zadaj cas kola: ");
         scanf(" %f", &vstup);
