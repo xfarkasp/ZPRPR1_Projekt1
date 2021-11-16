@@ -21,33 +21,67 @@ int Pocet_riadkov(){
     }
     else{
         while (fgets(ln, 1000, subor)){
-                Riadky++;
+            if(ln[0] != '\n'){Riadky++;}
         }
     }
     fclose(subor);
     return Riadky;
 }
+
+
+int Kontrola_struktury(FILE *Subor)
+{
+
+   int poradie=1, pocet_bc=0, chybna_struktura=0, skuska=0;
+   char c;
+    while((c = fgetc(Subor)) != EOF ){
+        if(c!='\n')
+        {
+            if(c==';')
+            {
+                pocet_bc++;
+            }
+        }
+        else{
+             if(pocet_bc!=8)
+                {
+                    printf("nespravny pocet udajov na riadku: %d\n", poradie);
+                    printf("pocet ciarok v riadku %d: %d\n", poradie, pocet_bc);
+                    chybna_struktura++;
+                }
+            poradie++;
+            pocet_bc=0;
+        }
+    }
+    if(pocet_bc!=8)
+    {
+        printf("nespravny pocet udajov na riadku: %d\n", poradie);
+        printf("pocet ciarok v riadku %d: %d\n", poradie, pocet_bc);
+        chybna_struktura++;
+    }
+    return chybna_struktura;
+}
+
 void vytvor(FILE *Subor,Jazdci *Jazdec){
     char ln[1000], *string, meno[100];
     int pomoc=0, poradie=0;
+    fgets(ln, 1000, Subor);
+
+        fseek(Subor, 0,SEEK_SET);
         while (fgets(ln, 1000, Subor)){
-                memset(meno, 0, sizeof(meno));//toto tam musi byt, inak struktura vypisuje nezmiselne krstne mena
+             if(ln[0] != '\n'){
+                memset(meno, 0, sizeof(meno));//toto tam musi byt na vynulovanie stringu krstneho mena, inak struktura vypisuje nezmiselne krstne mena kvoli tomu, ze ak nove krstne meno je kratsie, tak tam zostanu zvysne znaky z predosleho dlhsieho
                 string=strtok(ln, ";");//rozdeluje nacitany riadok po ;
                 strcpy(Jazdec[poradie].krstne ,string);
                 string=strrchr(Jazdec[poradie].krstne, ' ');
                 strcpy(Jazdec[poradie].priezvisko,string+1);
-
                 pomoc=strlen(Jazdec[poradie].krstne)-strlen(Jazdec[poradie].priezvisko);
-
                 strncpy(meno, Jazdec[poradie].krstne, pomoc-1);
                 strcpy(Jazdec[poradie].krstne, meno);
-
                 string=strtok(NULL, ";");
                 Jazdec[poradie].pohlavie=string[0];
-
                 string=strtok(NULL, ";");
                 Jazdec[poradie].narodenie=atoi(string);
-
                 string=strtok(NULL, ";");
                 strcpy(Jazdec[poradie].Auto,string);
                 for (int i = 0; i < 5; ++i) {
@@ -56,35 +90,24 @@ void vytvor(FILE *Subor,Jazdci *Jazdec){
                 }
             pomoc=0;
             poradie++;
-    }
-    // for(int i=0; i<poradie;i++){
-    //             printf("%s", Jazdec[i].krstne);
-    //             printf(" %s", Jazdec[i].priezvisko);
-    //             printf(" %c", Jazdec[i].pohlavie);
-    //             printf(" %d", Jazdec[i].narodenie);
-    //             printf(" %s", Jazdec[i].Auto);
-    //             printf(" %.3f", Jazdec[i].kola[0]);
-    //             printf(" %.3f", Jazdec[i].kola[1]);
-    //             printf(" %.3f", Jazdec[i].kola[2]);
-    //             printf(" %.3f", Jazdec[i].kola[3]);
-    //             printf(" %.3f\n\n", Jazdec[i].kola[4]);
-    // }
+            }
+        }
+
 }
+
 void sum(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r");
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
-        printf("otvoreny subor\n");
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
+        fclose(subor);
         for(int i=0; i<Pocet_riadkov();i++){
             printf("%s", Jazdec[i].krstne);
             printf(" %s,", Jazdec[i].priezvisko);
@@ -109,21 +132,19 @@ void driver(){
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         char vstup[100];
-        int poradie=0;
+        int poradie=0, nenaslo=0;
         float mini=9999, maxi=0, avengers=0;
         printf("Zadaj priezvisko jazdca: ");
         scanf("%s", &vstup);
         printf("\n");
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
+        fclose(subor);
         for(int i=0;i<Pocet_riadkov();i++){
             if(strcmp(vstup, Jazdec[i].priezvisko)==0){
                 for(int j=0;j<5;j++){
@@ -153,23 +174,26 @@ void driver(){
             printf("\nNajlepsie kolo: %.3f\nNajhorsie kolo: %.3f\nPriemerne: %.3f\n", mini, maxi, avengers/5);
             break;
             }
+            else{nenaslo++;}
         }
+        if(nenaslo==Pocet_riadkov())
+            {printf(" Jazdec sa nenasiel\n");}
     }
 }
 void lap(){
     FILE* subor;
     subor=fopen("jazdci.csv","r");
-    if(subor==NULL){
-        printf("Subor nie je mozne precitat.");
-    }else{
+    if(subor==NULL)
+    {
+      printf("Neotvoreny subor\n");
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
+        fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
@@ -183,23 +207,22 @@ void lap(){
                     }
             }
         }
-        printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
+        printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
     }
 }
 void gender(){
     FILE* subor;
     subor=fopen("jazdci.csv","r");
-    if(subor==NULL){
-        printf("Subor nie je mozne precitat.");
-    }else{
+    if(subor==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
         char volba=' ';
         float najlepsie_kolo=9999;
         int poradie_kola=0;
@@ -220,23 +243,23 @@ void gender(){
             }
             printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
         }
-        else{printf("nespravny vstup");}
+        else{printf("nespravny vstup\n");}
     }
 }
 void brand(){
     FILE* subor;
     subor=fopen("jazdci.csv","r");
-    if(subor==NULL){
-        printf("Subor nie je mozne precitat.");
-    }else{
+    if(subor==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
+        fclose(subor);
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
@@ -263,11 +286,7 @@ void brand(){
                       }
                     }
                 }
-                if(najlepsie_kolo==9999)
-                {
-                    //break;
-                }
-                else
+                if(najlepsie_kolo!=9999)
                 {
                     printf("Znacka: %s\nNajlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n\n", Jazdec[poradie_jazdca].Auto,najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
                 }
@@ -277,27 +296,28 @@ void brand(){
                 strcpy(opakovanie[poradie_opakovania], Jazdec[i].Auto);
                 poradie_opakovania++;
         }
+        memset(opakovanie, 0, sizeof(opakovanie));
     }
 }
+
 void year(){
     FILE* subor;
     subor=fopen("jazdci.csv","r");
-    if(subor==NULL){
-        printf("Subor nie je mozne precitat.");
-    }else{
+    if(subor==NULL)
+   {
+      printf("Neotvoreny subor\n");
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         int poradie=0;
         Jazdci Jazdec[Pocet_riadkov()];
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
         int volba=0;
         float najlepsie_kolo=9999;
         int poradie_kola=0;
         int poradie_jazdca=0;
-        printf("zadaj rok narodenia: ");
+        printf("zadaj rok narodenia vo formate YYYY: ");
         scanf(" %d", &volba);
         if((999<volba&&volba<10000))
         {
@@ -314,7 +334,7 @@ void year(){
             }
             printf("Najlepsie kolo: %.3f\nJazdec: %s %s\ncislo kola: %d\n", najlepsie_kolo, Jazdec[poradie_jazdca].krstne, Jazdec[poradie_jazdca].priezvisko, poradie_kola);
         }
-        else{printf("nespravny format roka");}
+        else{printf("nespravny format roka\n");}
     }
 }
 void average(){
@@ -323,16 +343,14 @@ void average(){
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         printf("otvoreny subor\n");
         Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0;
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
         float avengers=0;
         float najlepsi_avenger=9999;
         int najlepsi_avenger_poradie=0;
@@ -365,7 +383,6 @@ void average(){
         }
         printf("\nNajlepsie:\n%s %s - %.3f\n", Jazdec[najlepsi_avenger_poradie].krstne, Jazdec[najlepsi_avenger_poradie].priezvisko, najlepsi_avenger);
    }
-    //memset(Jazdec,0,sizeof(Jazdec));
 }
 void under(){
    FILE *subor;
@@ -373,16 +390,14 @@ void under(){
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         printf("otvoreny subor\n");
         Jazdci Jazdec[Pocet_riadkov()];
         int poradie=0, nenaslo=0;
         vytvor(subor,(Jazdci *) &Jazdec);
-        if(fclose(subor)== 0)
-        {
-        printf("\nFILE SUCCESSFULLY CLOSED\n");
-        }
-        else{printf("subor sa nezavrel");}
         float vstup;
         printf("zadaj cas kola: ");
         scanf(" %f", &vstup);
@@ -412,38 +427,52 @@ void under(){
 }
 void newdriver(){
    FILE *subor;
-   subor = fopen("jazdci.csv", "a");
+   subor = fopen("jazdci.csv", "r");
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
-        char krstne[100], priezvisko[100], pohlavie=' ', znacka[50], vloz[1000];
-        int rok=0;
-        float kolo1=0, kolo2=0, kolo3=0, kolo4=0, kolo5=0;
-        printf("zadaj meno jazdca: ");
-        scanf(" %s %s", &krstne, &priezvisko);
-        printf("zadaj rok narodenia: ");
-        scanf(" %d", &rok);
-        printf("zadaj pohlavie jazdca: ");
-        scanf(" %c",&pohlavie);
-        printf("zadaj auto jazdca: ");
-        scanf(" %s",&znacka);
-        printf("\n");
-        printf("zadaj 5 casov jazdca: ");
-        scanf(" %f;%f;%f;%f;%f", &kolo1, &kolo2, &kolo3, &kolo4, &kolo5);
-        printf("\n");
-        fprintf(subor,"\n%s %s;%c;%d;%s;%f;%f;%f;%f;%f", krstne, priezvisko, pohlavie, rok, znacka, kolo1, kolo2, kolo3, kolo4, kolo5);
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
+
         fclose(subor);
+        subor = fopen("jazdci.csv", "a");
+        if(subor==NULL)
+        {
+          printf("Neotvoreny subor\n");
+        }
+        else{
+            char krstne[100], priezvisko[100], pohlavie=' ', znacka[50], vloz[1000];
+            int rok=0;
+            float kolo1=0, kolo2=0, kolo3=0, kolo4=0, kolo5=0;
+            printf("zadaj meno jazdca: ");
+            scanf(" %s %s", &krstne, &priezvisko);
+            printf("zadaj rok narodenia: ");
+            scanf(" %d", &rok);
+            printf("zadaj pohlavie jazdca: ");
+            scanf(" %c",&pohlavie);
+            printf("zadaj auto jazdca: ");
+            scanf(" %s",&znacka);
+            printf("\n");
+            printf("zadaj 5 casov jazdca: ");
+            scanf(" %f;%f;%f;%f;%f", &kolo1, &kolo2, &kolo3, &kolo4, &kolo5);
+            printf("\n");
+            fprintf(subor,"\n%s %s;%c;%d;%s;%f;%f;%f;%f;%f", krstne, priezvisko, pohlavie, rok, znacka, kolo1, kolo2, kolo3, kolo4, kolo5);
+            fclose(subor);
+            }
     }
 }
-
 void change(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r+");
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
         char priezvisko[100], c;
         int poradie_jazdca=1, poradie_kola=0, offsetik=0;
         float nove_kolo=0, kola[5], jezis_pomoz=0;
@@ -455,113 +484,66 @@ void change(){
         scanf(" %f", &nove_kolo);
         printf("\n");
         Jazdci Jazdec[Pocet_riadkov()];
-        int riadok=0, nenaslo=1, hviezdicka=0, original_pocet_riadkov=Pocet_riadkov();
+        int riadok=0, nenaslo=1, hviezdicka=0, original_pocet_riadkov=Pocet_riadkov(), nenasiel=0;
         vytvor(subor,(Jazdci *) &Jazdec);
-        printf("pocet riadok1: %d\n", Pocet_riadkov()); 
-
         for(int i=0;i<Pocet_riadkov();i++){
             riadok++;
             if(strcmp(priezvisko, Jazdec[i].priezvisko)==0){
+                Jazdec[i].kola[poradie_kola-1]=nove_kolo;
                 break;
             }
+            else{nenasiel++;}
         }
-        printf("riadok: %d\n", riadok);
-        
-        fseek(subor, 0,SEEK_SET);
-        while((c = fgetc(subor)) != EOF ){
-                hviezdicka++;
-                //printf("%c", c);
-                if(c=='\n')
+        if(nenasiel==Pocet_riadkov())
+            {printf("Jazdec sa nenasiel\n");}
+        else{
+            FILE *subor2;
+            subor2 = fopen("docasne.csv", "w");
+            fseek(subor2, hviezdicka,SEEK_SET);
+            for(int i=0;i<Pocet_riadkov();i++){
+                fprintf(subor2,"%s %s;%c;%d;%s", Jazdec[i].krstne, Jazdec[i].priezvisko, Jazdec[i].pohlavie, Jazdec[i].narodenie, Jazdec[i].Auto);
+                for(int j=0;j<5;j++)
                 {
-                    printf("\nkoniec riadku\n");
-                    nenaslo++;
-                    if (nenaslo==riadok)
-                    {   int prvy_cas=0;
-                        printf("\nnasiel som gazembera\n");
-                        while((c = fgetc(subor)) != '\n' ){
-                            printf("%c", c);
-                            hviezdicka++;
-                
-                            if(c==';'){
-                                prvy_cas++;
-                                printf("bodkociarka\n");
-                                printf("prvy cas: %d\n", prvy_cas);
-                            }
-                            if(prvy_cas-3>=poradie_kola)
-                                {
-                                     while((c = fgetc(subor)) != EOF ){
-                                        //hviezdicka++;
-                                            ungetc(c,subor);
-                                            fputc('*', subor);
-                                            
-                                    }
-                                    break;
-                                }
-                        }
-                        break;
-                    }
-                } 
-        }
-       FILE *subor2;
-        subor2 = fopen("docasne.csv", "w");
-        fseek(subor, 0,SEEK_SET);
-        while((c = fgetc(subor)) != EOF ){
-            if(c!='*'){
-                //printf("%c", c);
-                fputc(c, subor2);
-            }
-        }
-        fseek(subor2, hviezdicka,SEEK_SET);
-        fprintf(subor2,"%.3f", nove_kolo);
-                for (int i = poradie_kola; i < 5; ++i)
-                {
-                    fprintf(subor2,";%.3f", Jazdec[riadok].kola[i]);
+                    fprintf(subor2,";%.3f", Jazdec[i].kola[j]);
                 }
-                fprintf(subor2,"\n");
-        printf("pocet riadok: %d\n", Pocet_riadkov()); 
-
-        for(int i=riadok;i<original_pocet_riadkov;i++)
-        {
-            fprintf(subor2,"%s %s;%c;%d;%s", Jazdec[i].krstne, Jazdec[i].priezvisko, Jazdec[i].pohlavie, Jazdec[i].narodenie, Jazdec[i].Auto);
-            for(int j=0;j<5;j++)
-            {
-                fprintf(subor2,";%.3f", Jazdec[i].kola[j]);
+                if(Pocet_riadkov()-1!=i)
+                {fprintf(subor2,"\n");}
             }
-            fprintf(subor2,"\n");
+            fclose(subor);
+            fclose(subor2);
+            remove("jazdci.csv");
+            rename("docasne.csv", "jazdci.csv");
+            sum();
         }
-        
-        fclose(subor);
-        fclose(subor2);
-        remove("jazdci.csv");
-        rename("docasne.csv", "jazdci.csv");
-        //sum();
     }
 }
-
 void rmdriver(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r+");
    if(subor==NULL)
    {
       printf("Neotvoreny subor\n");
-    } else{
-        char priezvisko[100];
+    }
+    else if(Kontrola_struktury(subor)!=0)
+        {printf("Nespravna struktura\n");}
+    else{
+        char priezvisko[100], cele_meno[100];
         printf("zadaj meno jazdca: ");
         scanf(" %s", &priezvisko);
         printf("\n");
         char ln[1000],ln2[1000],*string;
         int pocet=0;
+        fseek(subor, 0,SEEK_SET);
         while (fgets(ln, 1000, subor)){
                 pocet++;
-                printf("ln1: %s", ln);
                 strcpy(ln2, ln);
                 int gazember=0;
                 char hladaj_priezvisko[100];
                 string=strtok(ln, ";");//rozdeluje nacitany riadok po ;
                 strcpy(hladaj_priezvisko, string);
+                strcpy(cele_meno, string);
                 string=strrchr(hladaj_priezvisko, ' ');
                 strcpy(hladaj_priezvisko,string+1);
-                //printf("%s", hladaj_priezvisko);
                 string=strtok(NULL, ";");
                 string=strtok(NULL, ";");
                 string=strtok(NULL, ";");
@@ -573,8 +555,6 @@ void rmdriver(){
                     break;
                 }
         }
-        printf("\nln2: %s", ln2);
-        printf("\nln2: %ld", strlen(ln2));
         if(pocet==Pocet_riadkov()){
             fseek(subor, -strlen(ln2)-2,SEEK_CUR);
 
@@ -586,7 +566,7 @@ void rmdriver(){
             fseek(subor, 0,SEEK_SET);
         }
 
-        for(int i=0;i<=strlen(ln2);i++){//vo Windowse musi byt i<=strlen(ln2) a na linuxe i<strlen(ln2), aby sa vymazal endl znak
+        for(int i=0;i<strlen(ln2);i++){//vo Windowse musi byt i<=strlen(ln2) a na linuxe i<strlen(ln2), aby sa vymazal endl znak
             fprintf(subor,"*");
              }
 
@@ -596,7 +576,6 @@ void rmdriver(){
         fseek(subor, 0,SEEK_SET);
         while((c = fgetc(subor)) != EOF ){
             if(c!='*'){
-                printf("%c", c);
                 fputc(c, subor2);
             }
         }
@@ -604,12 +583,33 @@ void rmdriver(){
         fclose(subor2);
         remove("jazdci.csv");
         rename("docasne.csv", "jazdci.csv");
-        sum();
+        printf("Jazdec %s bol uspesne odstraneny\n", cele_meno);
     }
 }
+void vypisy_menu()
+{
+    printf("----------------------------------------\n");
+    printf("-    aplikacia automobilove preteky    -\n");
+    printf("----------------------------------------\n");
+    printf("Prikaz s: vypis pretekarov\n");
+    printf("Prikaz d: vyhladanie udajov o jazdcovi\n");
+    printf("Prikaz l: najlepsi vysledok\n");
+    printf("Prikaz g: najlepsie vysledky podla pohlavia\n");
+    printf("Prikaz b: najlepsie vysledky na jednotlivych znackach\n");
+    printf("Prikaz y: najlepsie vysledky pretekarov narodenych pred zadanym rokom\n");
+    printf("Prikaz a: priemer pretekarov\n");
+    printf("Prikaz u: vysledky pretekarov, ktore su lepsie ako zadany cas\n");
+    printf("Prikaz c: zmena casu pretekara\n");
+    printf("Prikaz n: pridanie pretekara\n");
+    printf("Prikaz r: zmazanie pretekara \n");
+    printf("----------------------------------------\n");
+    printf("Vasa volba: ");
+}
+
 int main() {
     char Vstup=' ';
     while (1) {
+        vypisy_menu();
         scanf(" %c", &Vstup);
         if (Vstup == 's') {
            sum();
