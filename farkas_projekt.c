@@ -436,6 +436,7 @@ void newdriver(){
         fclose(subor);
     }
 }
+
 void change(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r+");
@@ -443,9 +444,9 @@ void change(){
    {
       printf("Neotvoreny subor\n");
     } else{
-        char priezvisko[100];
+        char priezvisko[100], c;
         int poradie_jazdca=1, poradie_kola=0, offsetik=0;
-        float nove_kolo=0, kola[5];
+        float nove_kolo=0, kola[5], jezis_pomoz=0;
         printf("zadaj meno jazdca: ");
         scanf(" %s", &priezvisko);
         printf("zadaj poradie kola: ");
@@ -453,112 +454,90 @@ void change(){
         printf("zadaj novy cas jazdca: ");
         scanf(" %f", &nove_kolo);
         printf("\n");
-        char ln[1000],*string;
-        while (fgets(ln, 1000, subor)){
-                int gazember=0;
-                char hladaj_priezvisko[100];
-                string=strtok(ln, ";");//rozdeluje nacitany riadok po ;
-                strcpy(hladaj_priezvisko, string);
-                string=strrchr(hladaj_priezvisko, ' ');
-                strcpy(hladaj_priezvisko,string+1);
-                //printf("%s", hladaj_priezvisko);
-                string=strtok(NULL, ";");
-                string=strtok(NULL, ";");
-                string=strtok(NULL, ";");
-                for (int i = 1; i <= 5; ++i) {
-                    string=strtok(NULL, ";");
-                    kola[i]=atof(string);
-                    if(strcmp(hladaj_priezvisko, priezvisko)==0&&poradie_kola==i)
-                    {
-                        kola[poradie_kola]=nove_kolo;
-                        gazember=1;
+        Jazdci Jazdec[Pocet_riadkov()];
+        int riadok=0, nenaslo=1, hviezdicka=0, original_pocet_riadkov=Pocet_riadkov();
+        vytvor(subor,(Jazdci *) &Jazdec);
+        printf("pocet riadok1: %d\n", Pocet_riadkov()); 
 
+        for(int i=0;i<Pocet_riadkov();i++){
+            riadok++;
+            if(strcmp(priezvisko, Jazdec[i].priezvisko)==0){
+                break;
+            }
+        }
+        printf("riadok: %d\n", riadok);
+        
+        fseek(subor, 0,SEEK_SET);
+        while((c = fgetc(subor)) != EOF ){
+                hviezdicka++;
+                //printf("%c", c);
+                if(c=='\n')
+                {
+                    printf("\nkoniec riadku\n");
+                    nenaslo++;
+                    if (nenaslo==riadok)
+                    {   int prvy_cas=0;
+                        printf("\nnasiel som gazembera\n");
+                        while((c = fgetc(subor)) != '\n' ){
+                            printf("%c", c);
+                            hviezdicka++;
+                
+                            if(c==';'){
+                                prvy_cas++;
+                                printf("bodkociarka\n");
+                                printf("prvy cas: %d\n", prvy_cas);
+                            }
+                            if(prvy_cas-3>=poradie_kola)
+                                {
+                                     while((c = fgetc(subor)) != EOF ){
+                                        //hviezdicka++;
+                                            ungetc(c,subor);
+                                            fputc('*', subor);
+                                            
+                                    }
+                                    break;
+                                }
+                        }
+                        break;
                     }
-                }
-                if (gazember==1)
-                {
-                    break;
-                }
-                poradie_jazdca++;
+                } 
         }
-        if(poradie_jazdca==Pocet_riadkov())
-        {
-            if(poradie_kola==5)
-            {
-                offsetik=-6;
-            }
-            else if(poradie_kola==4)
-            {
-                offsetik=-13;
-            }
-            else if(poradie_kola==3)
-            {
-                offsetik=-20;
-            }
-            else if(poradie_kola==2)
-            {
-                offsetik=-27;
-            }
-            else if(poradie_kola==1)
-            {
-                offsetik=-33;
+       FILE *subor2;
+        subor2 = fopen("docasne.csv", "w");
+        fseek(subor, 0,SEEK_SET);
+        while((c = fgetc(subor)) != EOF ){
+            if(c!='*'){
+                //printf("%c", c);
+                fputc(c, subor2);
             }
         }
-        else{
-            if(poradie_kola==5)
-            {
-                if(10<kola[3]&&kola[3]<100)
+        fseek(subor2, hviezdicka,SEEK_SET);
+        fprintf(subor2,"%.3f", nove_kolo);
+                for (int i = poradie_kola; i < 5; ++i)
                 {
-                  offsetik=-5;
+                    fprintf(subor2,";%.3f", Jazdec[riadok].kola[i]);
                 }
-                else{offsetik=-8;}
-                fseek(subor, offsetik,SEEK_CUR);
-                fprintf(subor,"%.3f", kola[poradie_kola]);
-                fprintf(subor,";%.3f", kola[5]);
+                fprintf(subor2,"\n");
+        printf("pocet riadok: %d\n", Pocet_riadkov()); 
 
-            }
-            else if(poradie_kola==4)
+        for(int i=riadok;i<original_pocet_riadkov;i++)
+        {
+            fprintf(subor2,"%s %s;%c;%d;%s", Jazdec[i].krstne, Jazdec[i].priezvisko, Jazdec[i].pohlavie, Jazdec[i].narodenie, Jazdec[i].Auto);
+            for(int j=0;j<5;j++)
             {
-                if(10<kola[3]&&kola[3]<100)
-                {
-                  offsetik=-10;
-                }
-                else{offsetik=-15;}
-                fseek(subor, offsetik,SEEK_CUR);
-                fprintf(subor,"%.3f", kola[poradie_kola]);
-                fprintf(subor,";%.3f", kola[5]);
+                fprintf(subor2,";%.3f", Jazdec[i].kola[j]);
             }
-            else if(poradie_kola==3)
-            {
-                if(10<kola[3]&&kola[3]<100)
-                {
-                  offsetik=-17;
-                  fseek(subor, offsetik,SEEK_CUR);
-                  fprintf(subor,"%.3f", kola[poradie_kola]);
-                  fprintf(subor,";%.3f", kola[4]);
-                  fprintf(subor,";%.3f\n", kola[5]);
-                }
-                else{
-                    offsetik=-22;
-                    fseek(subor, offsetik,SEEK_CUR);
-                    fprintf(subor,"%.3f", kola[poradie_kola]);
-                    fprintf(subor,";%.3f", kola[4]);
-                    fprintf(subor,";%.3f", kola[5]);
-                }
-            }
-            else if(poradie_kola==2)
-            {
-                offsetik=-29;
-            }
-            else if(poradie_kola==1)
-            {
-                offsetik=-35;
-            }
+            fprintf(subor2,"\n");
         }
+        
         fclose(subor);
-        sum();
+        fclose(subor2);
+        remove("jazdci.csv");
+        rename("docasne.csv", "jazdci.csv");
+        //sum();
     }
 }
+
 void rmdriver(){
    FILE *subor;
    subor = fopen("jazdci.csv", "r+");
